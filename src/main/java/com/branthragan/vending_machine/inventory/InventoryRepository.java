@@ -44,7 +44,10 @@ public class InventoryRepository {
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id);
 
-        return template.queryForObject(QUERY_INVENTORY_ITEM, params, InventoryItem.class);
+        return template.queryForObject(QUERY_INVENTORY_ITEM, params, (resultSet, i) -> new InventoryItem(
+                resultSet.getLong("id"),
+                resultSet.getString("name"),
+                resultSet.getInt("total")));
     }
 
     public InventoryItem updateItemTotal(InventoryItem item) {

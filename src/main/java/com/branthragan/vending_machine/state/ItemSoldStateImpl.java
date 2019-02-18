@@ -1,11 +1,14 @@
 package com.branthragan.vending_machine.state;
 
+import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.log.TransactionLog;
 import com.branthragan.vending_machine.machine.VendingMachine;
 import sun.plugin.dom.exception.InvalidStateException;
 
 
 public class ItemSoldStateImpl implements VendingState {
+    private static final int DISPENSE_DELTA = -1;
+
     private TransactionLog log;
     private VendingStateManager stateManager;
 
@@ -29,19 +32,17 @@ public class ItemSoldStateImpl implements VendingState {
     }
 
     @Override
-    public void selectItem(VendingMachine machine, String item) {
+    public void selectItem(VendingMachine machine, InventoryItem item) {
         log.logInteraction(INVALID_ACTION);
 
         machine.setState(this);
     }
 
     @Override
-    public void dispense(VendingMachine machine, String item) {
-        String message = String.format("Dispense %s", item);
-        log.logPurchase(message);
-
-        if (machine.hasItemInInventory(item)) {
-            machine.updateInventory(item, -1);
+    public void dispense(VendingMachine machine, InventoryItem item) {
+        if (machine.hasItemInInventory(item.getId())) {
+            machine.releaseItem(item);
+            machine.updateInventory(item, DISPENSE_DELTA);
 
             if (machine.hasItemsInInventory()) {
                 machine.setState(stateManager.getNoFundsState());

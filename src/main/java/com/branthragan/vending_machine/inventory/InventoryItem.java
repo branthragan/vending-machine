@@ -15,6 +15,10 @@ public class InventoryItem {
         this.count = count;
     }
 
+    public void updateCount(int delta) {
+        this.count += delta;
+    }
+
     public Long getId() {
         return id;
     }

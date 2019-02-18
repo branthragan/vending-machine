@@ -1,25 +1,28 @@
 package com.branthragan.vending_machine.demo;
 
-import com.branthragan.vending_machine.log.TransactionLog;
-import com.branthragan.vending_machine.log.TransactionLogInMemoryImpl;
+import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.machine.VendingMachine;
-import com.branthragan.vending_machine.state.VendingStateManager;
+
+import java.util.Map;
+import java.util.Optional;
 
 public final class DemoVendingMachine {
 
-    public static void runStateDemo() {
-        TransactionLog log = new TransactionLogInMemoryImpl();
+    private VendingMachine machine;
 
-        VendingMachine machine = new VendingMachine(new VendingStateManager(log), log);
+    public DemoVendingMachine(VendingMachine machine) {
+        this.machine = machine;
+    }
 
+    public void runStateDemo() {
         machine.insertFunds();
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
 
         machine.insertFunds();
         machine.ejectFunds();
 
         //Fail test
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
 
         //Fail test
         machine.ejectFunds();
@@ -27,20 +30,21 @@ public final class DemoVendingMachine {
         //Fail test
         machine.insertFunds();
         machine.ejectFunds();
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
 
         System.out.println("Items remaining: " + machine.getCount());
         System.out.println("Finished state demo.\n");
     }
 
-    public static void runDemoToEmpty() {
-        TransactionLog log = new TransactionLogInMemoryImpl();
-
-        VendingMachine machine = new VendingMachine(new VendingStateManager(log), log);
-
+    public void runDemoToEmpty() {
         for (int i = machine.getCount() + 1; i > 0; i--) {
             machine.insertFunds();
-            machine.selectItem("Beverage1");
+
+            Optional<InventoryItem> itemOptional = machine.getInventory().entrySet().stream()
+                    .filter(entry -> entry.getValue().getCount() > 0)
+                    .map(Map.Entry::getValue)
+                    .findFirst();
+            itemOptional.ifPresent(item -> machine.selectItem(item.getId()));
 
             System.out.println("Items remaining: " + machine.getCount());
         }
@@ -48,7 +52,7 @@ public final class DemoVendingMachine {
         System.out.println("Finished run to empty demo.");
         System.out.println("Final inventory:");
 
-        machine.getInventory().forEach((item, count) ->
-                System.out.println("Item: " + item + " Count: " + count));
+        machine.getInventory().forEach((id, item) ->
+                System.out.println("Item: " + item.getId() + " (" + item.getName() + ") Count: " + item.getCount()));
     }
 }

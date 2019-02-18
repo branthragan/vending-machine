@@ -1,5 +1,6 @@
 package com.branthragan.vending_machine.state;
 
+import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.log.TransactionLog;
 import com.branthragan.vending_machine.machine.VendingMachine;
 
@@ -32,15 +33,13 @@ public class HasFundsStateImpl implements VendingState {
     }
 
     @Override
-    public void selectItem(VendingMachine machine, String item) {
-        String message = String.format("%s selected", item);
-        log.logInteraction(message);
+    public void selectItem(VendingMachine machine, InventoryItem item) {
+        log.logInteraction(String.format("%s selected", item.getName()));
 
-        if (machine.hasItemInInventory(item)) {
+        if (machine.hasItemInInventory(item.getId())) {
             machine.setState(stateManager.getItemSoldState());
         } else {
-            String unableToDispense = String.format("Unable to dispense %s Please make another selection", item);
-            log.logError(unableToDispense);
+            log.logError(String.format("Unable to dispense %s Please make another selection", item));
 
             machine.setState(this);
         }
@@ -48,7 +47,7 @@ public class HasFundsStateImpl implements VendingState {
     }
 
     @Override
-    public void dispense(VendingMachine machine, String item) {
+    public void dispense(VendingMachine machine, InventoryItem item) {
         log.logInteraction(INVALID_ACTION);
 
         machine.setState(this);

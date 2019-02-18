@@ -1,14 +1,17 @@
 package com.branthragan.vending_machine.machine;
 
-import com.branthragan.vending_machine.demo.DemoInventory;
+import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.log.TransactionLog;
 import com.branthragan.vending_machine.state.VendingState;
 import com.branthragan.vending_machine.state.VendingStateManager;
+import com.branthragan.vending_machine.vending_service.VendingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import sun.plugin.dom.exception.InvalidStateException;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,33 +21,35 @@ public class VendingMachine {
     private TransactionLog log;
 
     private VendingStateManager stateManager;
+    private VendingService service;
 
     private VendingState state;
 
-    //TODO need to get inventory from repo
-    private Map<String, Integer> inventory;
+    private Map<Long, InventoryItem> inventory;
 
     @Autowired
     public VendingMachine(VendingStateManager stateManager,
+                          VendingService service,
                           TransactionLog log) {
 
         this.stateManager = stateManager;
+        this.service = service;
         this.log = log;
 
-        this.setState(stateManager.getSoldOutState());
-
-        //TODO Move this to a callable location
-        this.initializeInventory(DemoInventory.buildInventory());
-    }
-
-    public void initializeInventory(Map<String, Integer> inventory) {
-        this.inventory = inventory;
+        this.initializeInventory();
 
         if (this.hasItemsInInventory()) {
             this.setState(stateManager.getNoFundsState());
         } else {
             this.setState(stateManager.getSoldOutState());
         }
+    }
+
+    public void initializeInventory() {
+        List<InventoryItem> items = service.getInventory();
+
+        this.inventory = new HashMap<>();
+        items.forEach(item -> this.inventory.put(item.getId(), item));
     }
 
     public void insertFunds() {
@@ -55,48 +60,48 @@ public class VendingMachine {
         this.state.ejectFunds(this);
     }
 
-    public void selectItem(String item) {
-        if (this.hasItemInInventory(item)) {
-            this.state.selectItem(this, item);
-            this.state.dispense(this, item);
+    public void selectItem(Long id) {
+        if (this.hasItemInInventory(id)) {
+            this.state.selectItem(this, this.inventory.get(id));
+            this.state.dispense(this, this.inventory.get(id));
         } else {
-            String message = String.format("%s is sold out. Please select another.", item);
-            this.log.logInteraction(message);
+            this.log.logInteraction(
+                    String.format("%s is sold out. Please select another.", this.inventory.get(id).getName()));
 
             this.setState(stateManager.getHasFundsState());
         }
     }
 
-    //TODO Need to persist inventory update
-    public void updateInventory(String item, int netChange) {
-        int count;
-        if (this.inventory.containsKey(item)) {
-            if (this.inventory.get(item) > 0) {
-                count = this.inventory.get(item);
-                count = count + netChange;
-                this.inventory.put(item, count);
+    public void releaseItem(InventoryItem item) {
+        log.logPurchase(String.format("Release %s", item.getName()));
+    }
+
+    public void updateInventory(InventoryItem item, int delta) {
+        if (this.inventory.containsKey(item.getId())) {
+            InventoryItem currentItem = this.inventory.get(item.getId());
+            if (currentItem.getCount() > 0) {
+                currentItem.updateCount(delta);
+                service.updateItemTotal(currentItem);
             } else {
                 String message = "Inventory mismatch. Unable to update";
                 this.log.logError(message);
                 throw new InvalidStateException(message);
             }
-        } else if (netChange > 0) {
-            this.inventory.put(item, netChange);
         }
     }
 
     public int getCount() {
         AtomicInteger total = new AtomicInteger();
-        inventory.forEach((item, count) -> total.addAndGet(count));
+        inventory.forEach(((id, item) -> total.addAndGet(item.getCount())));
         return total.intValue();
     }
 
     public boolean hasItemsInInventory() {
-        return inventory.entrySet().stream().anyMatch(item -> item.getValue() > 0);
+        return inventory.entrySet().stream().anyMatch(entry -> entry.getValue().getCount() > 0);
     }
 
-    public boolean hasItemInInventory(String item) {
-        return inventory.containsKey(item) && inventory.get(item) > 0;
+    public boolean hasItemInInventory(Long id) {
+        return inventory.containsKey(id) && inventory.get(id).getCount() > 0;
     }
 
     public void setState(VendingState state) {
@@ -107,11 +112,7 @@ public class VendingMachine {
         return state;
     }
 
-    public Map<String, Integer> getInventory() {
+    public Map<Long, InventoryItem> getInventory() {
         return inventory;
-    }
-
-    public TransactionLog getLog() {
-        return log;
     }
 }

@@ -28,7 +28,7 @@ class VendingMachineTest {
 
         machine.insertFunds();
         machine.ejectFunds();
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
     }
 
     @Test
@@ -37,7 +37,7 @@ class VendingMachineTest {
 
         machine.insertFunds();
         machine.ejectFunds();
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
     }
 
     @Test
@@ -46,7 +46,7 @@ class VendingMachineTest {
 
         machine.insertFunds();
         machine.ejectFunds();
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
     }
 
     @Test
@@ -55,6 +55,6 @@ class VendingMachineTest {
 
         machine.insertFunds();
         machine.ejectFunds();
-        machine.selectItem("Beverage1");
+        machine.selectItem(1001L);
     }
 }

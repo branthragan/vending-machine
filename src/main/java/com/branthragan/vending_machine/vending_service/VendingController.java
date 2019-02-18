@@ -1,5 +1,6 @@
 package com.branthragan.vending_machine.vending_service;
 
+import com.branthragan.vending_machine.demo.DemoVendingMachine;
 import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.machine.VendingMachine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,20 @@ public class VendingController {
         return machine.getState().toString();
     }
 
+    //TODO add request parameter to pass along
     @PostMapping("/vend/")
     public String selectItem() {
-        machine.selectItem("beverage1");
+        machine.selectItem(1001L);
 
         return machine.getState().toString();
+    }
+
+    @GetMapping("/vend/demo")
+    public void runDemo() {
+        DemoVendingMachine demo = new DemoVendingMachine(this.machine);
+
+        demo.runStateDemo();
+        demo.runDemoToEmpty();
     }
 
 }

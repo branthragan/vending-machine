@@ -1,5 +1,6 @@
 package com.branthragan.vending_machine.state;
 
+import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.machine.VendingMachine;
 
 public interface VendingState {
@@ -10,7 +11,7 @@ public interface VendingState {
 
     void ejectFunds(VendingMachine machine);
 
-    void selectItem(VendingMachine machine, String item);
+    void selectItem(VendingMachine machine, InventoryItem item);
 
-    void dispense(VendingMachine machine, String item);
+    void dispense(VendingMachine machine, InventoryItem item);
 }
