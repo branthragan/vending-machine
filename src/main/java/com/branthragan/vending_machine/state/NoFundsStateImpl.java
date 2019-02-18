@@ -41,4 +41,9 @@ public class NoFundsStateImpl implements VendingState {
 
         machine.setState(this);
     }
+
+    @Override
+    public String toString() {
+        return "No Funds";
+    }
 }

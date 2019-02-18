@@ -38,4 +38,9 @@ public class SoldOutStateImpl implements VendingState {
 
         machine.setState(this);
     }
+
+    @Override
+    public String toString() {
+        return "Sold Out";
+    }
 }

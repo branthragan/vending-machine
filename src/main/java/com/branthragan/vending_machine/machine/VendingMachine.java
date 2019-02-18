@@ -21,6 +21,7 @@ public class VendingMachine {
 
     private VendingState state;
 
+    //TODO need to get inventory from repo
     private Map<String, Integer> inventory;
 
     @Autowired
@@ -66,6 +67,7 @@ public class VendingMachine {
         }
     }
 
+    //TODO Need to persist inventory update
     public void updateInventory(String item, int netChange) {
         int count;
         if (this.inventory.containsKey(item)) {

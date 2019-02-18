@@ -1,5 +1,6 @@
 package com.branthragan.vending_machine.vending_service;
 
+import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.machine.VendingMachine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -7,37 +8,46 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class VendingController {
     private VendingMachine machine;
+    private VendingService service;
 
     @Autowired
-    public VendingController(VendingMachine machine) {
+    public VendingController(VendingMachine machine, VendingService service) {
         this.machine = machine;
+        this.service = service;
     }
 
     @GetMapping("/vend")
-    public String getAvailableItems(Model model) {
-        //TODO return item list & count
+    public List<InventoryItem> getAvailableItems(Model model) {
+        List<InventoryItem> inventory = service.getInventory();
 
         model.addAttribute("count", machine.getCount());
-        return "vend";
+        return inventory;
     }
 
     @PostMapping("/vend/insert-funds")
-    public void insertFunds() {
+    public String insertFunds() {
         machine.insertFunds();
-        System.out.println("inserted coin");
+
+        return machine.getState().toString();
     }
 
     @PostMapping("/vend/eject-funds")
-    public void ejectFunds() {
+    public String ejectFunds() {
+        machine.ejectFunds();
 
+        return machine.getState().toString();
     }
 
     @PostMapping("/vend/")
-    public void selectItem() {
+    public String selectItem() {
+        machine.selectItem("beverage1");
 
+        return machine.getState().toString();
     }
 
 }

@@ -55,4 +55,9 @@ public class ItemSoldStateImpl implements VendingState {
             throw new InvalidStateException(inventoryMismatch);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Item Sold";
+    }
 }

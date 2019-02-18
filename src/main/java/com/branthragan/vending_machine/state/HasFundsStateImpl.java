@@ -53,4 +53,9 @@ public class HasFundsStateImpl implements VendingState {
 
         machine.setState(this);
     }
+
+    @Override
+    public String toString() {
+        return "Has Funds";
+    }
 }
