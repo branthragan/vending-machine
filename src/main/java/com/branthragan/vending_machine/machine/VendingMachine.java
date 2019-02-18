@@ -64,16 +64,20 @@ public class VendingMachine {
         this.state.ejectFunds(this);
     }
 
-    public void selectItem(Long id) {
+    public InventoryItem selectItem(Long id) {
         if (this.hasItemInInventory(id)) {
             this.state.selectItem(this, this.inventory.get(id));
             this.state.dispense(this, this.inventory.get(id));
+
+            return this.inventory.get(id);
         } else {
             this.log.logInteraction(
                     String.format("%s is sold out. Please select another.", this.inventory.get(id).getName()));
 
             this.setState(stateManager.getHasFundsState());
         }
+
+        return null;
     }
 
     public void releaseItem(InventoryItem item) {

@@ -6,6 +6,7 @@ import com.branthragan.vending_machine.machine.VendingMachine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +31,18 @@ public class VendingController {
         return inventory;
     }
 
+    @PostMapping("/vend/{id}")
+    public String selectItem(@PathVariable("id") Long id) {
+        InventoryItem item = machine.selectItem(id);
+
+        if (item != null) {
+            return "Grab your " + item.getName() + ". " + item.getCount() + " remaining.";
+        } else {
+            return "Please make another selection";
+        }
+
+    }
+
     @PostMapping("/vend/insert-funds")
     public String insertFunds() {
         machine.insertFunds();
@@ -40,14 +53,6 @@ public class VendingController {
     @PostMapping("/vend/eject-funds")
     public String ejectFunds() {
         machine.ejectFunds();
-
-        return machine.getState().toString();
-    }
-
-    //TODO add request parameter to pass along
-    @PostMapping("/vend/")
-    public String selectItem() {
-        machine.selectItem(1001L);
 
         return machine.getState().toString();
     }
