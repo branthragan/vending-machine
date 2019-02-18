@@ -5,3 +5,9 @@ CREATE TABLE inventory
   total INTEGER,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE purchase_history
+(
+  transaction_datetime TIMESTAMP NOT NULL,
+  id                   LONG      NOT NULL
+)

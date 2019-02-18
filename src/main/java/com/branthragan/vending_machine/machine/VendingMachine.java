@@ -2,6 +2,7 @@ package com.branthragan.vending_machine.machine;
 
 import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.log.TransactionLog;
+import com.branthragan.vending_machine.purchase_history.PurchaseHistoryService;
 import com.branthragan.vending_machine.state.VendingState;
 import com.branthragan.vending_machine.state.VendingStateManager;
 import com.branthragan.vending_machine.vending_service.VendingService;
@@ -21,7 +22,8 @@ public class VendingMachine {
     private TransactionLog log;
 
     private VendingStateManager stateManager;
-    private VendingService service;
+    private VendingService vendingService;
+    private PurchaseHistoryService historyService;
 
     private VendingState state;
 
@@ -29,11 +31,13 @@ public class VendingMachine {
 
     @Autowired
     public VendingMachine(VendingStateManager stateManager,
-                          VendingService service,
+                          VendingService vendingService,
+                          PurchaseHistoryService historyService,
                           TransactionLog log) {
 
         this.stateManager = stateManager;
-        this.service = service;
+        this.vendingService = vendingService;
+        this.historyService = historyService;
         this.log = log;
 
         this.initializeInventory();
@@ -46,7 +50,7 @@ public class VendingMachine {
     }
 
     public void initializeInventory() {
-        List<InventoryItem> items = service.getInventory();
+        List<InventoryItem> items = vendingService.getInventory();
 
         this.inventory = new HashMap<>();
         items.forEach(item -> this.inventory.put(item.getId(), item));
@@ -74,6 +78,7 @@ public class VendingMachine {
 
     public void releaseItem(InventoryItem item) {
         log.logPurchase(String.format("Release %s", item.getName()));
+        historyService.insertPurchaseHistory(item.getId());
     }
 
     public void updateInventory(InventoryItem item, int delta) {
@@ -81,7 +86,7 @@ public class VendingMachine {
             InventoryItem currentItem = this.inventory.get(item.getId());
             if (currentItem.getCount() > 0) {
                 currentItem.updateCount(delta);
-                service.updateItemTotal(currentItem);
+                vendingService.updateItemTotal(currentItem);
             } else {
                 String message = "Inventory mismatch. Unable to update";
                 this.log.logError(message);

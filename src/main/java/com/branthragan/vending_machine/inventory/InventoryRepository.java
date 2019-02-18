@@ -23,13 +23,10 @@ public class InventoryRepository {
     private static final String ADD_NEW_ITEM =
             "INSERT INTO inventory (id, name, total) VALUES (:id, :name, :total)";
 
-    private DataSource dataSource;
     private NamedParameterJdbcTemplate template;
 
     @Autowired
     public InventoryRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-
         this.template = new NamedParameterJdbcTemplate(dataSource);
     }
 
