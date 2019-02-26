@@ -69,6 +69,8 @@ public class VendingMachine {
             this.state.selectItem(this, this.inventory.get(id));
             this.state.dispense(this, this.inventory.get(id));
 
+            //TODO This does not do what I want it to do. You shouldn't get this back if the dispense failed
+            //TODO Should dispense return the item?
             return this.inventory.get(id);
         } else {
             this.log.logInteraction(
