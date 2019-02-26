@@ -49,7 +49,7 @@ public class VendingMachine {
         }
     }
 
-    public void initializeInventory() {
+    private void initializeInventory() {
         List<InventoryItem> items = vendingService.getInventory();
 
         this.inventory = new HashMap<>();
