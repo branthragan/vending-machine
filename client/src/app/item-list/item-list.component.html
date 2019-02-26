@@ -1,0 +1,9 @@
+<h2>Available Items</h2>
+
+<div>
+  <ul>
+    <li *ngFor="let item of items">
+      <span (click)="selectItem(item.id)">{{item.name}}</span>
+    </li>
+  </ul>
+</div>
