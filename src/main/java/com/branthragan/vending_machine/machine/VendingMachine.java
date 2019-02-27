@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class VendingMachine {
     private TransactionLog log;
 
-    private VendingStateManager stateManager;
     private VendingService vendingService;
     private PurchaseHistoryService historyService;
 
@@ -35,7 +34,6 @@ public class VendingMachine {
                           PurchaseHistoryService historyService,
                           TransactionLog log) {
 
-        this.stateManager = stateManager;
         this.vendingService = vendingService;
         this.historyService = historyService;
         this.log = log;
@@ -56,30 +54,22 @@ public class VendingMachine {
         items.forEach(item -> this.inventory.put(item.getId(), item));
     }
 
-    public void insertFunds() {
-        this.state.insertFunds(this);
+    public String insertFunds() {
+        return this.state.insertFunds(this);
     }
 
-    public void ejectFunds() {
-        this.state.ejectFunds(this);
+    public String ejectFunds() {
+        return this.state.ejectFunds(this);
     }
 
-    public InventoryItem selectItem(Long id) {
-        if (this.hasItemInInventory(id)) {
-            this.state.selectItem(this, this.inventory.get(id));
-            this.state.dispense(this, this.inventory.get(id));
+    public String selectItem(Long id) {
+        String message;
+        InventoryItem requestedItem = this.inventory.get(id);
 
-            //TODO This does not do what I want it to do. You shouldn't get this back if the dispense failed
-            //TODO Should dispense return the item?
-            return this.inventory.get(id);
-        } else {
-            this.log.logInteraction(
-                    String.format("%s is sold out. Please select another.", this.inventory.get(id).getName()));
+        this.state.selectItem(this, requestedItem);
+        message = this.state.dispense(this, requestedItem);
 
-            this.setState(stateManager.getHasFundsState());
-        }
-
-        return null;
+        return message;
     }
 
     public void releaseItem(InventoryItem item) {

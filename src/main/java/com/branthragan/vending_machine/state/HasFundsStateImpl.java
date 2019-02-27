@@ -6,7 +6,8 @@ import com.branthragan.vending_machine.machine.VendingMachine;
 
 
 public class HasFundsStateImpl implements VendingState {
-    private static final String MAKE_A_SELECTION = "You have already have one credit. Please make a selection";
+    private static final String HAS_FUNDS = "Has Funds";
+    private static final String ALREADY_HAVE_CREDIT = "You have already have one credit.";
     private static final String EJECT_COIN = "Eject coin. Please come back soon.";
 
     private TransactionLog log;
@@ -19,17 +20,23 @@ public class HasFundsStateImpl implements VendingState {
 
 
     @Override
-    public void insertFunds(VendingMachine machine) {
-        log.logInteraction(MAKE_A_SELECTION);
+    public String insertFunds(VendingMachine machine) {
+        String message = ALREADY_HAVE_CREDIT + " " + MAKE_A_SELECTION;
+        log.logInteraction(message);
 
         machine.setState(this);
+
+        return message;
     }
 
     @Override
-    public void ejectFunds(VendingMachine machine) {
-        log.logInteraction(EJECT_COIN);
+    public String ejectFunds(VendingMachine machine) {
+        String message = EJECT_COIN;
+        log.logInteraction(message);
 
         machine.setState(stateManager.getNoFundsState());
+
+        return message;
     }
 
     @Override
@@ -39,7 +46,7 @@ public class HasFundsStateImpl implements VendingState {
         if (machine.hasItemInInventory(item.getId())) {
             machine.setState(stateManager.getItemSoldState());
         } else {
-            log.logError(String.format("Unable to dispense %s Please make another selection", item));
+            log.logError(String.format("Unable to dispense %s Please make another selection", item.getName()));
 
             machine.setState(this);
         }
@@ -47,14 +54,17 @@ public class HasFundsStateImpl implements VendingState {
     }
 
     @Override
-    public void dispense(VendingMachine machine, InventoryItem item) {
-        log.logInteraction(INVALID_ACTION);
+    public String dispense(VendingMachine machine, InventoryItem item) {
+        String message = item.getName() + " is currently unavailable. " + MAKE_A_SELECTION;
+        log.logInteraction(message);
 
         machine.setState(this);
+
+        return message;
     }
 
     @Override
     public String toString() {
-        return "Has Funds";
+        return HAS_FUNDS;
     }
 }

@@ -13,17 +13,21 @@ public class SoldOutStateImpl implements VendingState {
     }
 
     @Override
-    public void insertFunds(VendingMachine machine) {
+    public String insertFunds(VendingMachine machine) {
         log.logInteraction(SOLD_OUT);
 
         machine.setState(this);
+
+        return SOLD_OUT;
     }
 
     @Override
-    public void ejectFunds(VendingMachine machine) {
+    public String ejectFunds(VendingMachine machine) {
         log.logInteraction(SOLD_OUT);
 
         machine.setState(this);
+
+        return SOLD_OUT;
     }
 
     @Override
@@ -34,14 +38,16 @@ public class SoldOutStateImpl implements VendingState {
     }
 
     @Override
-    public void dispense(VendingMachine machine, InventoryItem item) {
+    public String dispense(VendingMachine machine, InventoryItem item) {
         log.logInteraction(SOLD_OUT);
 
         machine.setState(this);
+
+        return SOLD_OUT;
     }
 
     @Override
     public String toString() {
-        return "Sold Out";
+        return SOLD_OUT;
     }
 }

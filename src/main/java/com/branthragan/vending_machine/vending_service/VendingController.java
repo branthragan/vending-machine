@@ -4,7 +4,6 @@ import com.branthragan.vending_machine.demo.DemoVendingMachine;
 import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.machine.VendingMachine;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,39 +21,30 @@ public class VendingController {
     }
 
     @GetMapping("/vend")
-    public List<InventoryItem> getAvailableItems(Model model) {
-        List<InventoryItem> inventory = service.getInventory();
+    public List<InventoryItem> getAvailableItems() {
 
-        model.addAttribute("count", machine.getCount());
-        return inventory;
+        return service.getInventory();
     }
 
     @PostMapping("/vend/{id}")
     public Response selectItem(@PathVariable("id") Long id) {
-        InventoryItem item = machine.selectItem(id);
+        String message = machine.selectItem(id);
 
-        Response response = new Response();
-        if (item != null) {
-            response.setMessage("Grab your " + item.getName() + ". " + item.getCount() + " remaining.");
-        } else {
-            response.setMessage("Please make another selection");
-        }
-
-        return response;
+        return new Response(message);
     }
 
     @PostMapping("/vend/insert-funds")
     public Response insertFunds() {
-        machine.insertFunds();
+        String message = machine.insertFunds();
 
-        return new Response(machine.getState().toString());
+        return new Response(message);
     }
 
     @PostMapping("/vend/eject-funds")
     public Response ejectFunds() {
-        machine.ejectFunds();
+        String message = machine.ejectFunds();
 
-        return new Response(machine.getState().toString());
+        return new Response(message);
     }
 
     @GetMapping("/vend/demo")

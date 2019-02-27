@@ -3,11 +3,11 @@ package com.branthragan.vending_machine.state;
 import com.branthragan.vending_machine.inventory.InventoryItem;
 import com.branthragan.vending_machine.log.TransactionLog;
 import com.branthragan.vending_machine.machine.VendingMachine;
-import sun.plugin.dom.exception.InvalidStateException;
 
 
 public class ItemSoldStateImpl implements VendingState {
     private static final int DISPENSE_DELTA = -1;
+    private static final String ITEM_SOLD = "Item Sold";
 
     private TransactionLog log;
     private VendingStateManager stateManager;
@@ -18,31 +18,40 @@ public class ItemSoldStateImpl implements VendingState {
     }
 
     @Override
-    public void insertFunds(VendingMachine machine) {
-        log.logInteraction(INVALID_ACTION);
+    public String insertFunds(VendingMachine machine) {
+        String message = ITEM_SOLD + " " + INVALID_ACTION;
+        log.logInteraction(message);
 
         machine.setState(this);
+
+        return message;
     }
 
     @Override
-    public void ejectFunds(VendingMachine machine) {
-        log.logInteraction(INVALID_ACTION);
+    public String ejectFunds(VendingMachine machine) {
+        String message = ITEM_SOLD + " " + INVALID_ACTION;
+        log.logInteraction(message);
 
         machine.setState(this);
+
+        return message;
     }
 
     @Override
     public void selectItem(VendingMachine machine, InventoryItem item) {
-        log.logInteraction(INVALID_ACTION);
+        log.logInteraction(ITEM_SOLD + " " + INVALID_ACTION);
 
         machine.setState(this);
     }
 
     @Override
-    public void dispense(VendingMachine machine, InventoryItem item) {
+    public String dispense(VendingMachine machine, InventoryItem item) {
+        String message;
+
         if (machine.hasItemInInventory(item.getId())) {
             machine.releaseItem(item);
             machine.updateInventory(item, DISPENSE_DELTA);
+            message = String.format("Enjoy your %s! %d remaining.", item.getName(), item.getCount());
 
             if (machine.hasItemsInInventory()) {
                 machine.setState(stateManager.getNoFundsState());
@@ -50,15 +59,14 @@ public class ItemSoldStateImpl implements VendingState {
                 machine.setState(stateManager.getSoldOutState());
             }
         } else {
-            String inventoryMismatch =
-                    String.format("Inventory mismatch. Unable to dispense %s Please make another selection", item);
-            log.logError(inventoryMismatch);
-            throw new InvalidStateException(inventoryMismatch);
+            message = String.format("%s is sold out. Please select another.", item.getName());
         }
+
+        return message;
     }
 
     @Override
     public String toString() {
-        return "Item Sold";
+        return ITEM_SOLD;
     }
 }
