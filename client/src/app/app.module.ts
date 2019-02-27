@@ -8,12 +8,14 @@ import {HttpClientModule} from '@angular/common/http';
 import {ItemListComponent} from './item-list/item-list.component';
 import {CoinSlotComponent} from './coin-slot/coin-slot.component';
 import {MatButtonModule, MatCardModule, MatInputModule, MatListModule, MatToolbarModule} from '@angular/material';
+import {MessageComponent} from './message/message.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ItemListComponent,
-    CoinSlotComponent
+    CoinSlotComponent,
+    MessageComponent
   ],
   imports: [
     BrowserModule,

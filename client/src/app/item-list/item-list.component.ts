@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {VendService} from '../service/vend.service';
+import {VendService} from '../service/vend/vend.service';
+import {MessageService} from '../service/message/message.service';
 
 @Component({
   selector: 'app-item-list',
@@ -9,7 +10,8 @@ import {VendService} from '../service/vend.service';
 export class ItemListComponent implements OnInit {
   items: Array<any>;
 
-  constructor(private vendService: VendService) {
+  constructor(private vendService: VendService,
+              private messageService: MessageService) {
   }
 
   ngOnInit() {
@@ -20,9 +22,13 @@ export class ItemListComponent implements OnInit {
 
   selectItem(id: number): void {
     this.vendService.selectItem(id).subscribe(
-      response => console.log(response.message),
+      response => this.log(response.message),
       err => console.log(err)
     );
+  }
+
+  private log(message: string) {
+    this.messageService.addMessage(message);
   }
 
 }
