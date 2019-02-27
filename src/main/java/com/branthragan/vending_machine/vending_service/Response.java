@@ -3,10 +3,7 @@ package com.branthragan.vending_machine.vending_service;
 public class Response {
     private String message;
 
-    public Response() {
-    }
-
-    public Response(String message) {
+    Response(String message) {
         this.message = message;
     }
 

@@ -109,10 +109,6 @@ public class VendingMachine {
         this.state = state;
     }
 
-    public VendingState getState() {
-        return state;
-    }
-
     public Map<Long, InventoryItem> getInventory() {
         return inventory;
     }
